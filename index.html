@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>여우비온 Type</title>
+    <!-- 모던한 감성을 위한 폰트: Noto Sans KR (본문), Poppins (영문/숫자) -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        /* [CSS - 모던 디자인 스타일] */
+        :root {
+            --bg-color: #f0f2f5;
+            --container-bg: #ffffff;
+            --primary-color: #3b82f6;
+            --accent-color: #8b5cf6;
+            --text-color: #1f2937;
+            --untyped-color: #d1d5db;
+            --wrong-color: #ef4444;
+            --sub-text-color: #6b7280;
+            --correct-color: #10b981;
+            --font-kr: 'Noto Sans KR', sans-serif;
+            --font-en: 'Poppins', sans-serif;
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --radius-lg: 24px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: var(--font-kr);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            background: var(--container-bg);
+            width: 100%;
+            max-width: 800px;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            padding: 50px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* --- Header & Options --- */
+        .header {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .title {
+            font-weight: 700;
+            font-family: var(--font-en);
+            font-size: 1.5rem;
+            color: var(--text-color);
+            letter-spacing: -0.5px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px; /* 버튼 간격 통일 */
+            align-items: center;
+        }
+
+        /* [수정] 통일된 버튼/컨트롤 스타일 (.header-btn) */
+        .header-btn {
+            height: 38px; /* 높이 고정으로 통일감 부여 */
+            padding: 0 14px;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-family: var(--font-kr);
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--sub-text-color);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            text-decoration: none;
+            outline: none;
+        }
+
+        .header-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            background: #f8fafc;
+            transform: translateY(-1px);
+        }
+
+        /* Select 박스 커스텀 (버튼 모양 흉내) */
+        .select-wrapper {
+            position: relative;
+            padding: 0 10px; /* 내부 여백 */
+        }
+        
+        .select-wrapper select {
+            border: none;
+            background: transparent;
+            font-family: inherit;
+            font-size: inherit;
+            font-weight: inherit;
+            color: inherit;
+            cursor: pointer;
+            outline: none;
+            padding-left: 4px;
+        }
+        
+        .select-label {
+            font-size: 0.85rem;
+            color: inherit;
+        }
+
+        /* --- Cat Animation Area --- */
+        .cat-stage {
+            width: 100%;
+            height: 160px; 
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            margin-bottom: 20px;
+        }
+
+        .vector-cat { 
+            width: 140px; 
+            height: 140px; 
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            overflow: visible; 
+        }
+
+        .cat-body { fill: #f3f4f6; stroke: #374151; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+        .cat-feature { fill: none; stroke: #374151; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+        .cat-eyes-fill { fill: #374151; }
+        .cat-cheeks { fill: #fca5a5; opacity: 0; transition: opacity 0.3s; }
+        .cat-paws { fill: #f3f4f6; stroke: #374151; stroke-width: 2.5; }
+        .keyboard { fill: #e5e7eb; stroke: #374151; stroke-width: 2; }
+        .key { fill: #ffffff; stroke: #374151; stroke-width: 1.5; }
+
+        /* Rain Cloud Styles */
+        .rain-group { opacity: 0; transition: opacity 0.2s; }
+        .rain-cloud { fill: #cbd5e1; stroke: #64748b; stroke-width: 2; }
+        .raindrop { stroke: #60a5fa; stroke-width: 2; stroke-linecap: round; }
+
+        /* Face & Ears Groups */
+        .face-group { display: none; }
+        .face-normal { display: block; }
+        
+        .ears-group { display: none; }
+        .ears-normal { display: block; } 
+        .ears-folded { display: none; } 
+
+        /* IDLE */
+        .cat-stage:not(.cat-typing):not(.cat-happy-typing):not(.cat-error):not(.cat-success) .face-normal .eye-l,
+        .cat-stage:not(.cat-typing):not(.cat-happy-typing):not(.cat-error):not(.cat-success) .face-normal .eye-r {
+            animation: blink 4s infinite;
+            transform-origin: center;
+        }
+
+        /* TYPING */
+        .cat-typing .paw-l, .cat-happy-typing .paw-l { animation: pawTap 0.2s infinite alternate; }
+        .cat-typing .paw-r, .cat-happy-typing .paw-r { animation: pawTap 0.2s 0.1s infinite alternate; }
+        
+        /* HAPPY TYPING */
+        .cat-happy-typing .face-normal { display: none; }
+        .cat-happy-typing .face-success { display: block; } 
+        .cat-happy-typing .cat-cheeks { opacity: 0.6; }
+        .cat-happy-typing .paw-l { animation: pawTap 0.2s infinite alternate; }
+        .cat-happy-typing .paw-r { animation: pawTap 0.2s 0.1s infinite alternate; }
+        
+        /* ERROR */
+        .cat-error .face-normal { display: none; }
+        .cat-error .face-error { display: block; }
+        .cat-error .ears-normal { display: none; }
+        .cat-error .ears-folded { display: block; }
+        
+        .cat-error .vector-cat { animation: winceShake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
+        .cat-error .cat-cheeks { opacity: 1; fill: #f87171; }
+        .cat-error .rain-group { opacity: 1; }
+        .cat-error .raindrop { animation: rainFall 0.6s linear infinite; }
+        .cat-error .raindrop:nth-child(2) { animation-delay: 0.2s; }
+        .cat-error .raindrop:nth-child(3) { animation-delay: 0.4s; }
+
+        /* SUCCESS */
+        .cat-success .face-normal { display: none; }
+        .cat-success .face-success { display: block; }
+        .cat-success .vector-cat { animation: happyJump 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .cat-success .cat-cheeks { opacity: 0.6; }
+
+        @keyframes blink {
+            0%, 96% { transform: scaleY(1); }
+            98% { transform: scaleY(0.1); }
+            100% { transform: scaleY(1); }
+        }
+        @keyframes pawTap {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(3px); }
+        }
+        @keyframes winceShake {
+            10%, 90% { transform: translate3d(-1px, 0, 0) rotate(-1deg); }
+            20%, 80% { transform: translate3d(2px, 0, 0) rotate(2deg); }
+            30%, 50%, 70% { transform: translate3d(-2px, 0, 0) rotate(-2deg); }
+            40%, 60% { transform: translate3d(2px, 0, 0) rotate(1deg); }
+        }
+        @keyframes happyJump {
+            0% { transform: translateY(0) scale(1); }
+            40% { transform: translateY(-15px) scale(1.05); }
+            100% { transform: translateY(0) scale(1); }
+        }
+        @keyframes rainFall {
+            0% { transform: translateY(0); opacity: 1; }
+            80% { opacity: 1; }
+            100% { transform: translateY(15px); opacity: 0; }
+        }
+
+        /* --- Stats Board --- */
+        .stats-board {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            width: 100%;
+            margin-bottom: 40px;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #f9fafb;
+            padding: 15px 10px;
+            border-radius: 12px;
+            transition: transform 0.2s;
+        }
+        .stat-item:hover { transform: translateY(-2px); }
+        .stat-label { font-size: 0.75rem; color: var(--sub-text-color); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+        .stat-value { font-size: 1.5rem; font-weight: 700; font-family: var(--font-en); color: var(--text-color); }
+
+        /* --- Typing Overlay Area --- */
+        .typing-wrapper {
+            position: relative;
+            width: 100%;
+            min-height: 120px;
+            margin-bottom: 30px;
+            cursor: text;
+        }
+
+        .quote-display {
+            font-size: 1.6rem;
+            line-height: 1.8;
+            text-align: left;
+            width: 100%;
+            user-select: none;
+            word-break: keep-all;
+            color: var(--untyped-color);
+            font-weight: 300;
+            white-space: pre-wrap; 
+        }
+
+        .quote-display span { 
+            position: relative; 
+        }
+
+        .quote-display span.correct { 
+            color: var(--text-color); 
+            font-weight: 400; 
+        } 
+        
+        .quote-display span.incorrect { 
+            color: var(--wrong-color); 
+            text-decoration: underline; 
+            text-decoration-thickness: 2px; 
+            font-weight: 400; 
+        }
+
+        .quote-display span.incorrect.typed-space {
+            background-color: rgba(239, 68, 68, 0.15);
+            display: inline-block;
+            min-width: 0.5em;
+        }
+
+        .quote-display span.active-input {
+            color: var(--text-color);
+            font-weight: 400;
+            text-decoration: none;
+        }
+
+        .quote-display span.active-input.typed-space {
+            background-color: rgba(59, 130, 246, 0.15);
+            display: inline-block;
+            min-width: 0.5em;
+        }
+
+        .quote-display span.current::before {
+            content: '';
+            position: absolute;
+            left: -1px; 
+            top: 15%;
+            height: 70%; 
+            width: 2px; 
+            background-color: var(--primary-color);
+            animation: cursorBlink 1s infinite;
+        }
+        
+        @keyframes cursorBlink { 
+            0%, 100% { opacity: 1; } 
+            50% { opacity: 0; } 
+        }
+        
+        #type-input {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            opacity: 0; z-index: 10; cursor: text; font-size: 1.6rem;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: #e5e7eb;
+            width: 100%;
+            margin-top: 5px;
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+            width: 0%;
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 999px;
+        }
+
+        /* --- Result Modal --- */
+        .modal {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.9);
+            backdrop-filter: blur(8px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.4s ease;
+            z-index: 20;
+        }
+        .modal.show { opacity: 1; pointer-events: all; }
+        .modal h2 { font-size: 2.5rem; margin-bottom: 30px; background: linear-gradient(to right, var(--primary-color), var(--accent-color)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; }
+        .modal p { font-size: 1.3rem; margin-bottom: 12px; font-weight: 500; color: var(--text-color); }
+        .highlight { color: var(--primary-color); font-weight: 800; }
+        .restart-btn { margin-top: 40px; padding: 14px 40px; background: var(--text-color); color: white; border: none; border-radius: 12px; font-family: var(--font-kr); font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        .restart-btn:hover { transform: translateY(-2px); background: black; }
+
+        /* Notification Toast */
+        .toast {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: rgba(31, 41, 55, 0.9);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 999px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        /* Help Modal */
+        .help-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        
+        .help-modal-overlay.open {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .help-modal-content {
+            background: white;
+            padding: 40px 30px;
+            border-radius: var(--radius-lg);
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            position: relative;
+            transform: translateY(20px);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .help-modal-overlay.open .help-modal-content {
+            transform: translateY(0);
+        }
+
+        .help-close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 1.8rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--sub-text-color);
+            line-height: 1;
+            transition: color 0.2s;
+        }
+        
+        .help-close-btn:hover {
+            color: var(--wrong-color);
+        }
+
+        .help-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 10px;
+        }
+        
+        .help-list li {
+            margin-bottom: 18px;
+            font-size: 1rem;
+            line-height: 1.6;
+            padding-left: 20px;
+            position: relative;
+            color: var(--text-color);
+            font-weight: 400;
+        }
+        
+        .help-list li::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .help-title {
+            font-family: var(--font-en);
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 25px;
+            color: var(--text-color);
+            text-align: center;
+        }
+
+        @media (max-width: 600px) {
+            .container { padding: 30px 20px; }
+            .quote-display { font-size: 1.3rem; }
+            .header { flex-direction: column; align-items: flex-start; gap: 15px; }
+            .controls { width: 100%; justify-content: space-between; }
+            .stats-board { gap: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <div class="title">여우비온 Type</div>
+        <div class="controls">
+            <!-- 1. Goal (Select) -->
+            <div class="header-btn select-wrapper">
+                <span class="select-label">문장 갯수</span>
+                <select id="sentence-count-select" onchange="resetSession()">
+                    <option value="10">10</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+            </div>
+            
+            <!-- 2. Restart Button -->
+            <button class="header-btn" onclick="resetSession()">
+                <span>↻</span> 다시 시작
+            </button>
+
+            <!-- 3. Help Button -->
+            <button class="header-btn" onclick="openHelp()">
+                <span>?</span> 도움말
+            </button>
+        </div>
+    </div>
+
+    <!-- Enhanced Cat Stage -->
+    <div class="cat-stage" id="cat-stage">
+        <!-- viewBox 위쪽 확장 유지 -->
+        <svg class="vector-cat" viewBox="0 -20 100 120" xmlns="http://www.w3.org/2000/svg">
+            
+            <!-- Rain Cloud Group (머리 위쪽) -->
+            <g class="rain-group" transform="translate(0, 0)">
+                <path d="M35,-5 Q40,-15 50,-10 Q60,-15 65,-5 Q70,0 60,0 L40,0 Q30,0 35,-5 Z" class="rain-cloud" />
+                <line x1="40" y1="2" x2="40" y2="8" class="raindrop" />
+                <line x1="50" y1="5" x2="50" y2="11" class="raindrop" />
+                <line x1="60" y1="2" x2="60" y2="8" class="raindrop" />
+            </g>
+
+            <!-- Keyboard -->
+            <g transform="translate(10, 80)">
+                <rect x="0" y="0" width="80" height="20" rx="2" class="keyboard" />
+                <rect x="5" y="3" width="10" height="6" rx="1" class="key" />
+                <rect x="18" y="3" width="10" height="6" rx="1" class="key" />
+                <rect x="31" y="3" width="10" height="6" rx="1" class="key" />
+                <rect x="44" y="3" width="10" height="6" rx="1" class="key" />
+                <rect x="57" y="3" width="10" height="6" rx="1" class="key" />
+                <rect x="5" y="11" width="70" height="6" rx="1" class="key" />
+            </g>
+
+            <!-- Body -->
+            <path d="M25,85 L25,45 Q25,25 50,25 Q75,25 75,45 L75,85 Z" class="cat-body" />
+            
+            <!-- 1. Normal Ears (쫑긋한 귀) -->
+            <g class="ears-group ears-normal">
+                <path d="M28,30 L20,10 L45,26" class="cat-body" />
+                <path d="M72,30 L80,10 L55,26" class="cat-body" />
+            </g>
+
+            <!-- 2. Folded Ears (접힌 귀 - Error State) -->
+            <g class="ears-group ears-folded">
+                <path d="M28,30 L18,22 L45,26" class="cat-body" /> 
+                <path d="M72,30 L82,22 L55,26" class="cat-body" /> 
+            </g>
+            
+            <circle cx="32" cy="58" r="5" class="cat-cheeks" />
+            <circle cx="68" cy="58" r="5" class="cat-cheeks" />
+
+            <!-- Paws -->
+            <ellipse cx="35" cy="82" rx="8" ry="6" class="cat-paws paw-l" />
+            <ellipse cx="65" cy="82" rx="8" ry="6" class="cat-paws paw-r" />
+
+            <!-- Normal Face -->
+            <g class="face-group face-normal">
+                <circle cx="35" cy="45" r="3.5" class="cat-eyes-fill eye-l" />
+                <circle cx="65" cy="45" r="3.5" class="cat-eyes-fill eye-r" />
+                <path d="M45,60 Q50,65 55,60" class="cat-feature" /> 
+            </g>
+
+            <!-- Error Face -->
+            <g class="face-group face-error">
+                <path d="M30,42 L38,45 L30,48" class="cat-feature" fill="none" />
+                <path d="M70,42 L62,45 L70,48" class="cat-feature" fill="none" />
+                <path d="M42,62 Q46,58 50,62 Q54,66 58,62" class="cat-feature" fill="none" />
+            </g>
+
+            <!-- Success / Happy Typing -->
+            <g class="face-group face-success">
+                <path d="M30,45 Q35,40 40,45" class="cat-feature" fill="none" />
+                <path d="M60,45 Q65,40 70,45" class="cat-feature" fill="none" />
+                <path d="M43,60 Q50,65 57,60" class="cat-feature" fill="none" />
+            </g>
+        </svg>
+    </div>
+
+    <div class="stats-board">
+        <div class="stat-item">
+            <span class="stat-label">Progress</span>
+            <span class="stat-value" id="progress-text">1 / 10</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">WPM</span>
+            <span class="stat-value" id="wpm">0</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">CPM</span>
+            <span class="stat-value" id="cpm">0</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Accuracy</span>
+            <span class="stat-value" id="accuracy">100%</span>
+        </div>
+    </div>
+
+    <div class="typing-wrapper" onclick="document.getElementById('type-input').focus()">
+        <div class="quote-display" id="quote-display"></div>
+        <input type="text" id="type-input" autocomplete="off">
+    </div>
+
+    <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill"></div>
+    </div>
+
+    <div class="toast" id="toast">Next Quote ✨</div>
+
+    <!-- 도움말 모달 -->
+    <div class="help-modal-overlay" id="help-modal" onclick="closeHelp(event)">
+        <div class="help-modal-content" onclick="event.stopPropagation()">
+            <button class="help-close-btn" onclick="closeHelp()">×</button>
+            <div class="help-title">Info</div>
+            <ul class="help-list">
+                <li>여우비온Type은 키보드와 관련된 명언 모음입니다. 그러나 명언이 아니라 헛소리 일수도 있어요ㅋㅋ</li>
+                <li>오타가 나면 여우비 캐릭터가 비를 맞아요. 비 맞지 않게 주의해주세요.</li>
+                <li>수정사항이나 추가하고 싶은 문장이 있다면 <br><span style="color:var(--primary-color)">yeoube_on@gmail.com</span> 으로 메일주세요!</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="modal" id="result-modal">
+        <h2>Session Complete</h2>
+        <p>Avg WPM: <span id="final-wpm">0</span></p>
+        <p>Avg CPM: <span id="final-cpm">0</span></p>
+        <p>Best CPM: <span id="best-cpm" class="highlight">0</span></p>
+        <p>Accuracy: <span id="final-acc">0</span>%</p>
+        <button class="restart-btn" onclick="resetSession()">Restart Journey</button>
+    </div>
+</div>
+
+<script>
+    // --- 데이터: 명언 (Yeoube_on 키보드 테마) ---
+    const quotes = [
+        "오늘 키보드를 조립하지 않으면 내일 2개를 조립해야 할 것이다.",
+        "스테빌 잘 잡아봤자 시간 지나면 망가진다.",
+        "오늘도 열심히 연마해서 스테빌 고수가 되어보자.",
+        "할 일이 없으면 스위치나 윤활해라.",
+        "체리 흑축은 진리이고 체리 갈축은 신이다.",
+        "할 일이 없으면 키보드 청소나 하자.",
+        "더러운 손으로 키보드를 만지는 것은 죄악이다.",
+        "지금 먹으려는 그 과자, 키보드는 안 먹고 싶단다.",
+        "일어나 출근해 돈 벌어서 키보드 사야지.",
+        "어쩌다 내가 커스텀 키보드를 시작했더라 왜 그랬을까?",
+        "그만 자고 일어나 스테빌 잡아야지.",
+        "조립할 키보드가 남아 있다는 것은 희망찬 내일이 있다는 것이다.",
+        "키보드는 하나인데 장패드는 왜 이렇게 많을까, 나도 모른다.",
+        "오늘도 키보드 사려고 일하는지, 일하려고 키보드를 사는지 헷갈린다.",
+        "통장 잔액은 비어가는데 책상 위 키보드는 늘어만 간다.",
+        "키보드는 꽉 찼는데 아직도 “이건 또 다른 느낌이야”라고 변명한다.",
+        "알루미늄 하우징을 샀으면, 그 무게만큼 책임도 진다.",
+        "가스켓 구조를 알기 전으로는 다시 돌아갈 수 없다.",
+        "스위치 윤활을 시작한 순간, 주말은 네 것이 아니다.",
+        "한 번 솔더링 맛보면 핫스왑으로 못 돌아간다.",
+        "타건감은 좋지만 통장이 울고 있습니다.",
+        "키캡을 바꿨을 뿐인데 책상이 새로워진 기분이다.",
+        "오늘도 나는 키보드 소리 듣고 멘탈을 수리한다.",
+        "음악 따윈 필요 없어 내 키보드가 이미 사운드 트랙이다.",
+        "도각도각 소리는 스트레스를 가져가고 지출을 데려온다.",
+        "이 키보드는 완성형이라고 다짐한 지 사흘 만에 새 키보드를 장바구니에 담았다.",
+        "지금 이 키보드가 마지막이라고 말하는 순간, 예구 링크가 뜬다.",
+        "키보드가 늘수록 설명할 변명도 늘어난다.",
+        "타건 테스트 5분 한다고 해놓고 한 시간째 타이핑 중이다.",
+        "키보드를 청소하면 인생도 함께 정리된 기분이 든다.",
+        "스페이스바 소리가 마음에 안 들면 하루가 마음에 안 든다.",
+        "스위치 스펙은 다 아는데 내 건강검진 수치는 잘 모른다.",
+        "오늘의 운동은 윤활 후 스위치 뚜껑 닫기 300회였다.",
+        "스테빌 소리 좋으면 이메일도 더 잘 쓰이는 기분이다.",
+        "사무실 키보드를 바꿨을 뿐인데 갑자기 일 잘하는 사람으로 보인다.",
+        "이 키보드는 사운드가 좋고 가격이 크다.",
+        "스위치를 바꾸면서, 인생도 이렇게 쉽게 바꿀 수 있으면 좋겠다고 생각했다.",
+        "오늘도 나는 키보드를 보면서 혼자 미소짓는다.",
+        "키보드를 모은 줄 알았는데, 사실 키보드에게 집을 점령 당하고 있었다.",
+        "책상 정리의 마지막 단계는 키보드는 그대로 두는 것이다.",
+        "서랍은 비어도 키보드 선반은 절대 비워지지 않는다.",
+        "스위치 윤활을 잘못하면, 오늘 하루 기분도 윤활이 필요해진다.",
+        "키보드 하나에 진심인 사람이, 인생에도 진심인 법이다.",
+        "키보드 가격은 기억나는데, 어제 뭐 먹었는지는 기억 안 난다.",
+        "새 키보드가 도착하는 날 택배 기사님은 산타다.",
+        "이 키보드가 얼마짜리인지 그녀에겐 비밀이다.",
+        "가끔은 사람 목소리보다 키보드 소리가 더 반갑다.",
+        "오늘도 말 대신 타건으로 감정을 표현해 본다.",
+        "지금 장바구니에 담긴 키보드들은 모두 필요한 키보드들이다.",
+        "이 정도면 취미가 아니라 키보드 연구직을 해도 되겠는 걸.",
+        "키보드 리뷰를 보는 시간이, 실제로 타이핑하는 시간보다 길다.",
+        "새로운 키보드를 사고 나면, 이전 키보드도 다시 예뻐 보이는 게 문제다.",
+        "키보드에 쓴 돈은 소비가 아니라 투자라고 우겨 본다.",
+        "키보드를 정리하려다가, 결국 사진 찍어 자랑 준비 한다.",
+        "지금 이 문장을 타이핑하는 너도 이미 키보드 골짜기에 빠져있다.",
+        "여우비온 유튜브에 좋아요나 하나 눌러야겠다.",
+        "혹시 여우비온 유튜브 아직 구독 안했다면 지금 그 키보드 맴매.",
+        "시킨 거 없는데 택배가 오면 작년에 주문한 키보드다.",
+        "이것만 사고 졸업해야지 라는 건 불가능하다.",
+        "내일은 내일의 키보드가 나타난다.",
+        "키보드를 아는 자가 세상을 아는 것은 아니지만, 최소한 타건감은 안다.",
+        "스페이스바 소리가 좋으면, 세상도 조금은 부드럽게 들린다.",
+        "너의 키보드 소리가 너의 미래를 만든다.",
+        "생각하라, 그리고 스페이스바를 눌러라.",
+        "작은 스위치 하나가 인생의 방향을 바꿀 수 있다.",
+        "급할수록 스페이스바는 더 무겁게 느껴진다.",
+        "고통은 일시적이지만, 납땜은 영원하다.",
+        "성공은 1%의 운과 99%의 스테빌 작업으로 이루어진다.",
+        "당신이 보는 세상은 당신이 쓰는 키보드만큼 아름답다.",
+        "길을 잃었다면 백스페이스를 눌러라.",
+        "하루를 바꾸고 싶다면 키캡을 바꿔라.",
+        "사람은 습관의 동물이고, 키보드는 구매의 동물이다.",
+        "뜻이 있는 곳에 길이 있으니 일단 키보드는 사고 봐라.",
+        "마음이 혼란스러울 땐, 키보드를 청소하라.",
+        "성공이란 실패를 거듭해도 스테빌을 다시 잡는 용기다.",
+        "완벽한 순간을 기다리지 마라. 타건감은 만들면 된다.",
+        "물 흐르듯 자연스럽게 여우비온 키보드 리뷰 영상을 보고 있네.",
+        "진짜 행복한 삶은 돈이 많은 것이 아니라, 키보드가 많은 것이다.",
+        "구부러진 스위치핀처럼 내 인생도 다시 펴서 잘 작동하면 좋겠어.",
+        "언젠가 정말 내 인생 최고의 키보드를 만나면 좋겠다.",
+        "오늘 일 안하면 갖고 싶은 키보드 하나 못산다.",
+        "인생은 엔터처럼 과감하게 눌러야 할 순간이 있다.",
+        "잘 만든 스페이스바 하나가 마음의 여백을 만든다.",
+        "키보드 소리로 하루를 정리할 수 있다면 그건 꽤 좋은 삶이다.",
+        "새로운 키보드를 들이면, 새로운 나도 함께 온다.",
+        "스위치를 윤활할 때처럼, 인생도 때론 부드럽게 다뤄야 한다.",
+        "쉬고 싶을 땐 쉬어라. 키보드 케이블도 가끔 빼줘라.",
+        "지금은 완벽해 보이는 키보드도 내일 보면 또 바꾸고 싶을 것이다.",
+        "타건감은 말로 설명할 수 없고 직접 느껴야 한다.",
+        "스테빌 소음처럼 인생에도 잡음은 존재한다.",
+        "내 인생 최대 숙제는 미니 배열 키보드를 정복하는 것이다.",
+        "바쁜 하루도 최애 키보드 한 번 두드리면 견딜 수 있다.",
+        "과거는 F5처럼 새로고침되지 않는다.",
+        "누구나 자신만의 이상적인 키감이라는 환상을 좇는다.",
+        "오랜만에 꺼내 본 키보드 하나가 기분을 바꾸는 날도 있다.",
+        "예쁜 키보드가 행복을 대신해주진 않지만, 기분은 확실히 좋아진다.",
+        "지금 장바구니에 담긴 키보드 결국 살 거니까 그냥 사자.",
+        "때로는 가벼운 스위치가 무거운 마음을 덜어준다.",
+        "풀알루 키보드의 묵직함 같은 사람이 되자. 어쩌면 풀서스도 가능.",
+        "손에 맞는 키보드를 찾는 건, 결국 나에게 맞는 삶을 찾는 것과 같다.",
+        "때로는 스위치가 아닌 내가 윤활이 필요한 날도 있다.",
+        "잘 정돈된 책상 위 키보드는 반쯤은 행복한 인생이다.",
+        "언제나 마지막이라고 말하지만, 다음 키보드는 이미 준비돼 있다.",
+        "키보드 소리는 힐링이고, 지출은 스릴이다.",
+        "폼떡 소리가 좋다가 클래키가 좋아지는 건 자연스러운 변화다.",
+        "키보드가 많아도 항상 하나만 더 사고 싶다면 정상이다.",
+        "키보드에 휴학은 있어도 졸업이란 없다.",
+        "내 키보드 소리 어때? 라는 말은 사실 칭찬해줘 라는 뜻이다.",
+        "이제 키보드 더 안 산다는 사람 치고 안 사는 사람 못봤다.",
+        "여유 보강판 두 개 더 사봤자 리빌드 안 한다."
+    ];
+
+    // --- 상태 변수 ---
+    let targetCount = 10;
+    let completedCount = 0;
+    
+    let currentStartTime = null;
+    let currentSentenceKeystrokes = 0;
+    let currentSentenceErrors = 0;
+    
+    let historyWPM = [];
+    let historyCPM = [];
+    let historyACC = [];
+
+    let currentQuote = "";
+    let isTyping = false;
+    let timerInterval = null;
+    let typingTimeout;
+    
+    // 랜덤 셔플용 큐
+    let quoteQueue = [];
+
+    // --- DOM ---
+    const quoteDisplay = document.getElementById('quote-display');
+    const typeInput = document.getElementById('type-input');
+    const wpmEl = document.getElementById('wpm');
+    const cpmEl = document.getElementById('cpm');
+    const accEl = document.getElementById('accuracy');
+    const progressText = document.getElementById('progress-text');
+    const progressFill = document.getElementById('progress-fill');
+    const modal = document.getElementById('result-modal');
+    const catStage = document.getElementById('cat-stage');
+    const countSelect = document.getElementById('sentence-count-select');
+    const toast = document.getElementById('toast');
+
+    // --- 유틸리티: 피셔-예이츠 셔플 ---
+    function shuffle(array) {
+        let currentIndex = array.length,  randomIndex;
+        // While there remain elements to shuffle.
+        while (currentIndex != 0) {
+            // Pick a remaining element.
+            randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex--;
+            // And swap it with the current element.
+            [array[currentIndex], array[randomIndex]] = [
+            array[randomIndex], array[currentIndex]];
+        }
+        return array;
+    }
+
+    // --- 유틸리티: 한글 타수 계산 ---
+    function getWeightedLength(str) {
+        let length = 0;
+        for (let i = 0; i < str.length; i++) {
+            const code = str.charCodeAt(i);
+            if (code >= 0xAC00 && code <= 0xD7A3) {
+                const hangul = code - 0xAC00;
+                const jong = hangul % 28;
+                length += (jong > 0 ? 3 : 2);
+            } else {
+                length += 1;
+            }
+        }
+        return length;
+    }
+
+    // --- 초기화 ---
+    function resetSession() {
+        targetCount = parseInt(countSelect.value);
+        
+        historyWPM = [];
+        historyCPM = [];
+        historyACC = [];
+        completedCount = 0;
+        
+        // 세션 시작 시 전체 목록 셔플
+        quoteQueue = shuffle([...quotes]);
+        
+        modal.classList.remove('show');
+        resetCat();
+        updateStatsUI(0, 0, 100);
+        updateProgressText();
+        
+        loadNextQuote();
+    }
+
+    function loadNextQuote() {
+        clearInterval(timerInterval);
+        isTyping = false;
+        currentStartTime = null; 
+        currentSentenceKeystrokes = 0;
+        currentSentenceErrors = 0;
+
+        typeInput.value = "";
+        typeInput.disabled = false;
+        progressFill.style.width = '0%';
+        
+        // 큐에서 하나씩 꺼내기 (중복 방지)
+        if (quoteQueue.length === 0) {
+            // 혹시라도 다 쓰면 다시 섞어서 채움 (무한 모드 대비)
+            quoteQueue = shuffle([...quotes]);
+        }
+        currentQuote = quoteQueue.pop();
+        
+        quoteDisplay.innerHTML = '';
+        currentQuote.split('').forEach(char => {
+            const span = document.createElement('span');
+            span.innerText = char;
+            span.dataset.original = char;
+            quoteDisplay.appendChild(span);
+        });
+        
+        if (quoteDisplay.firstChild) {
+            quoteDisplay.firstChild.classList.add('current');
+        }
+
+        typeInput.focus();
+    }
+
+    function updateProgressText() {
+        progressText.innerText = `${completedCount + 1} / ${targetCount}`;
+    }
+
+    // --- 타이머 & 통계 ---
+    function startTimer() {
+        if (!isTyping) {
+            isTyping = true;
+            updateStatsUI(0, 0, 100); 
+            currentStartTime = new Date(); 
+            timerInterval = setInterval(calculateCurrentStats, 500); 
+        }
+    }
+
+    function calculateCurrentStats() {
+        if (!currentStartTime) return { wpm: 0, cpm: 0, acc: 100 };
+        const now = new Date();
+        const timeElapsedMin = (now - currentStartTime) / 60000; 
+        if (timeElapsedMin <= 0) return { wpm: 0, cpm: 0, acc: 100 };
+
+        const weightedLength = getWeightedLength(typeInput.value);
+        if (weightedLength === 0) return { wpm: 0, cpm: 0, acc: 100 };
+
+        const cpm = Math.round(weightedLength / timeElapsedMin);
+        const wpm = Math.round((weightedLength / 5) / timeElapsedMin); 
+        
+        let accuracy = 0;
+        if (currentSentenceKeystrokes > 0) {
+            accuracy = Math.round(((currentSentenceKeystrokes - currentSentenceErrors) / currentSentenceKeystrokes) * 100);
+            if (accuracy < 0) accuracy = 0;
+        } else {
+            accuracy = 100;
+        }
+
+        updateStatsUI(wpm, cpm, accuracy);
+        return { wpm, cpm, accuracy };
+    }
+
+    function updateStatsUI(wpm, cpm, acc) {
+        wpmEl.innerText = isNaN(wpm) || !isFinite(wpm) ? 0 : wpm;
+        cpmEl.innerText = isNaN(cpm) || !isFinite(cpm) ? 0 : cpm;
+        accEl.innerText = acc;
+    }
+
+    // --- 고양이 상태 ---
+    function setCatState(state) {
+        catStage.className = 'cat-stage';
+        if (state) catStage.classList.add(`cat-${state}`);
+        
+        // 타이핑이나 에러 상태가 지속되지 않도록 타임아웃
+        clearTimeout(typingTimeout);
+        if (state === 'typing' || state === 'happy-typing' || state === 'error') {
+            typingTimeout = setTimeout(() => {
+                if (isTyping) catStage.className = 'cat-stage'; 
+            }, 500);
+        }
+    }
+    function resetCat() { catStage.className = 'cat-stage'; }
+
+    // --- 입력 핸들링 ---
+    typeInput.addEventListener('input', (e) => {
+        startTimer();
+        currentSentenceKeystrokes++; 
+
+        const inputVal = typeInput.value;
+        const spans = quoteDisplay.querySelectorAll('span');
+        const currentIndex = inputVal.length - 1;
+
+        // 1. 전체 스타일 리셋
+        spans.forEach((span, idx) => {
+            span.classList.remove('current'); 
+            span.classList.remove('active-input', 'correct', 'incorrect', 'typed-space');
+            
+            if (idx >= inputVal.length) {
+                span.className = '';
+                span.innerText = span.dataset.original; 
+            }
+        });
+
+        // 2. 입력된 글자 처리
+        for (let i = 0; i < inputVal.length; i++) {
+            if (i >= spans.length) break;
+            const typedChar = inputVal[i];
+            const targetChar = currentQuote[i];
+            const span = spans[i];
+            const isLastChar = (i === inputVal.length - 1);
+
+            // 공백 입력 시 시각적 표시
+            if (typedChar === ' ') {
+                span.classList.add('typed-space');
+            }
+
+            if (isLastChar) {
+                span.className = 'active-input';
+                span.innerText = (typedChar === ' ') ? span.dataset.original : typedChar;
+            } else {
+                if (typedChar === targetChar) {
+                    span.className = 'correct';
+                    span.innerText = span.dataset.original; 
+                } else {
+                    span.className = 'incorrect';
+                    span.innerText = (typedChar === ' ') ? span.dataset.original : typedChar;
+                }
+            }
+        }
+
+        // 3. 커서 이동
+        if (inputVal.length < currentQuote.length) {
+            spans[inputVal.length].classList.add('current');
+        }
+
+        // 입력 길이 제한
+        if (currentIndex >= currentQuote.length) {
+            typeInput.value = inputVal.slice(0, currentQuote.length);
+            return;
+        }
+
+        // 진행바
+        const progress = (inputVal.length / currentQuote.length) * 100;
+        progressFill.style.width = `${progress}%`;
+
+        // 4. 고양이 반응
+        if (inputVal.length > 0) {
+            const lastTypedChar = inputVal[currentIndex];
+            const lastTargetChar = currentQuote[currentIndex];
+            
+            if (e.isComposing || lastTypedChar === lastTargetChar) {
+                const progressRatio = inputVal.length / currentQuote.length;
+                if (progressRatio >= 0.85) { 
+                    setCatState('happy-typing');
+                } else {
+                    setCatState('typing');
+                }
+            } else {
+                currentSentenceErrors++; 
+                setCatState('error');
+            }
+        }
+
+        // 자동 완료 체크
+        if (inputVal.length === currentQuote.length && inputVal === currentQuote) {
+            finishSentence();
+        }
+    });
+
+    typeInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault(); 
+            if (typeInput.value.length === 0) return;
+            finishSentence();
+        }
+    });
+
+    // --- 문장 완료 ---
+    function finishSentence() {
+        const finalStats = calculateCurrentStats(); 
+        clearInterval(timerInterval); 
+
+        historyWPM.push(finalStats.wpm);
+        historyCPM.push(finalStats.cpm);
+        historyACC.push(finalStats.accuracy);
+
+        completedCount++;
+        setCatState('success');
+
+        if (completedCount >= targetCount) {
+            finishSession();
+        } else {
+            showToast();
+            // [수정] setTimeout 제거하여 즉시 실행 (입력 버퍼 문제 해결)
+            updateProgressText();
+            loadNextQuote();
+        }
+    }
+
+    function showToast() {
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 1500);
+    }
+
+    function finishSession() {
+        clearInterval(timerInterval);
+        isTyping = false;
+        typeInput.disabled = true;
+        
+        const avgWPM = historyWPM.length > 0 
+            ? Math.round(historyWPM.reduce((a, b) => a + b, 0) / historyWPM.length) 
+            : 0;
+        const avgCPM = historyCPM.length > 0 
+            ? Math.round(historyCPM.reduce((a, b) => a + b, 0) / historyCPM.length) 
+            : 0;
+        const avgACC = historyACC.length > 0 
+            ? Math.round(historyACC.reduce((a, b) => a + b, 0) / historyACC.length) 
+            : 0;
+        const maxCPM = historyCPM.length > 0 ? Math.max(...historyCPM) : 0;
+
+        document.getElementById('final-wpm').innerText = avgWPM;
+        document.getElementById('final-cpm').innerText = avgCPM; 
+        document.getElementById('best-cpm').innerText = maxCPM;   
+        document.getElementById('final-acc').innerText = avgACC;
+        
+        modal.classList.add('show');
+    }
+
+    // [추가] 도움말 모달 제어 함수
+    function openHelp() {
+        document.getElementById('help-modal').classList.add('open');
+    }
+    
+    function closeHelp(event) {
+        // event가 없으면(X버튼 클릭) 그냥 닫기
+        // event가 있으면(배경 클릭), target 확인
+        if (!event || event.target.id === 'help-modal') {
+            document.getElementById('help-modal').classList.remove('open');
+        }
+    }
+
+    resetSession();
+
+</script>
+</body>
+</html>
