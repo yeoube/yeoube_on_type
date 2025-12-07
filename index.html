@@ -368,6 +368,24 @@
         .restart-btn { margin-top: 40px; padding: 14px 40px; background: var(--text-color); color: white; border: none; border-radius: 12px; font-family: var(--font-kr); font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
         .restart-btn:hover { transform: translateY(-2px); background: black; }
 
+        /* Notification Toast */
+        .toast {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: rgba(31, 41, 55, 0.9);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 999px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
         /* Help Modal */
         .help-modal-overlay {
             position: fixed;
@@ -590,6 +608,8 @@
     <div class="progress-bar">
         <div class="progress-fill" id="progress-fill"></div>
     </div>
+
+    <div class="toast" id="toast">Next Quote ✨</div>
 
     <!-- 도움말 모달 -->
     <div class="help-modal-overlay" id="help-modal" onclick="closeHelp(event)">
@@ -950,7 +970,7 @@
     // --- 입력 핸들링 ---
     typeInput.addEventListener('input', (e) => {
         startTimer();
-        currentSentenceKeystrokes++; 
+        // [수정] input 이벤트에서는 keystroke 증가시키지 않음 (keydown에서 처리)
 
         const inputVal = typeInput.value;
         const spans = quoteDisplay.querySelectorAll('span');
@@ -1014,6 +1034,7 @@
             const lastTypedChar = inputVal[currentIndex];
             const lastTargetChar = currentQuote[currentIndex];
             
+            // [수정] 오타 체크 (입력 이벤트에서 체크하되, 카운트는 아래 로직 참고)
             if (e.isComposing || lastTypedChar === lastTargetChar) {
                 const progressRatio = inputVal.length / currentQuote.length;
                 if (progressRatio >= 0.85) { 
@@ -1022,14 +1043,37 @@
                     setCatState('typing');
                 }
             } else {
-                currentSentenceErrors++; 
+                // [수정] 입력 시 틀렸으면 에러 상태 (카운트는 keydown에서 처리하거나 여기서?)
+                // 여기서는 상태만 변경하고, 카운트는 keydown에서 처리하지 않음 (단순 문자 입력은 keydown으로 잡기 애매할 수 있음)
+                // 하지만 정확도 로직 변경에 따라 여기서 카운트하는게 맞음?
+                // 아니, 여기서는 backspace가 아님. 그냥 틀린 글자 입력.
+                // 틀린 글자 입력도 에러로 쳐야 함.
+                // 하지만 'keydown'에서 모든 키 입력을 세고 있음.
+                // 틀린 글자 입력 시 -> keystroke 증가 (keydown), error 증가 (여기서?)
+                
+                // [중요] 한글 조합 중이 아닐 때만 에러 카운트
+                if (!e.isComposing) {
+                     currentSentenceErrors++;
+                }
                 setCatState('error');
             }
         }
-        
     });
 
     typeInput.addEventListener('keydown', (e) => {
+        // [수정] 키 입력 수 카운트 (기능키 제외)
+        // Backspace도 입력 행위로 간주
+        if (e.key.length === 1 || e.key === 'Backspace' || e.key === 'Enter') {
+             if (!isTyping) startTimer(); // 타이머 시작 보장
+             currentSentenceKeystrokes++;
+        }
+
+        // [수정] 백스페이스는 무조건 에러 카운트 (수정 행위)
+        if (e.key === 'Backspace') {
+            currentSentenceErrors++;
+            setCatState('error'); // 지우는 것도 에러 반응
+        }
+
         const isComplete = typeInput.value === currentQuote;
 
         if (e.key === 'Enter') {
@@ -1109,5 +1153,3 @@
     resetSession();
 
 </script>
-</body>
-</html>
