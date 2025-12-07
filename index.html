@@ -368,24 +368,6 @@
         .restart-btn { margin-top: 40px; padding: 14px 40px; background: var(--text-color); color: white; border: none; border-radius: 12px; font-family: var(--font-kr); font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
         .restart-btn:hover { transform: translateY(-2px); background: black; }
 
-        /* Notification Toast */
-        .toast {
-            position: absolute;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%) translateY(20px);
-            background: rgba(31, 41, 55, 0.9);
-            color: white;
-            padding: 12px 24px;
-            border-radius: 999px;
-            font-size: 0.95rem;
-            font-weight: 500;
-            opacity: 0;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
-        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
         /* Help Modal */
         .help-modal-overlay {
             position: fixed;
@@ -609,8 +591,6 @@
         <div class="progress-fill" id="progress-fill"></div>
     </div>
 
-    <div class="toast" id="toast">Next Quote ✨</div>
-
     <!-- 도움말 모달 -->
     <div class="help-modal-overlay" id="help-modal" onclick="closeHelp(event)">
         <div class="help-modal-content" onclick="event.stopPropagation()">
@@ -758,7 +738,7 @@
         "스위치 소리 하나에도 감정이 흔들리는 사람은 낭만적인 사람이다.",
         "그 키보드, 스위치, 키캡 오늘 안 사면 품절 된다.",
         "누가 키보드를 왜 좋아하냐고 묻는다면 근데 왜 좋아 하더라?",
-        "적금통장 깨서 키보드 사면 인정.",
+        "적금 통장 깨서 키보드 사면 인정.",
         "커스텀 키보드가 취미가 될 줄은 몰랐다.",
         "그만 사려고 했는데 왜 이쁜 키보드들이 계속 나오는 걸까?.",
         "뭘 좋아하는지 모르는 사람도 많은데 난 적어도 키보드를 좋아하는 사람.",
@@ -768,7 +748,7 @@
         "여우비온 이라는 유튜버 영상 열심히 만들더라.",
         "내가 샀던 첫 기계식 키보드가 뭐더라 잠시 떠올려보자.",
         "퇴근하고 키보드 리빌드하면서 스트레스가 풀리는 거 보면 신기해.",
-        "넷플릭스 틀어 놓고 보면서 스위치 윤활하면 그렇게 시간이 잘 가.",
+        "넷플릭스 틀어 놓고 보면서 스위치 윤활하면 그렇게 시간이 잘가.",
         "새 키보드를 쓰는 날은 기분이 이상하게 더 좋다.",
         "삶도 키보드처럼 핫스왑이면 얼마나 좋을까.",
         "세상엔 두 부류가 있다. 키보드에 진심인 사람과 아직 모르는 사람.",
@@ -779,7 +759,7 @@
         "오타 나도 괜찮다. 마음이 급했던 것뿐이다.",
         "사실 타이핑 소리는 도각도각 몽글몽글로는 표현이 다 안돼.",
         "엄청 일하기 싫을 때 회사 키보드 새로 바꾸면 당분간은 괜찮아진다.",
-        "정말 슬픈 얘기 해줄게. 알파열 키캡 하나 잃어버렸어.",
+        "정말 슬픈 애기 해줄게. 알파열 키캡 하나 잃어버렸어.",
         "공부 시작 미루던 책상 청소, 일 시작 미루는 키보드 청소, 한결 같은 나.",
         "키보드 좋아하는 사람 치고 못된 사람 없지는 않다.",
         "오타 좀 많으면 어때 어차피 내 손가락이 그렇지 뭐.",
@@ -1047,20 +1027,16 @@
             }
         }
         
-        // [수정] 자동 완료 제거 - 여기서는 아무것도 하지 않음 (엔터/스페이스로만 넘김)
     });
 
     typeInput.addEventListener('keydown', (e) => {
-        // [수정] 문장 완성 여부 확인
         const isComplete = typeInput.value === currentQuote;
 
-        // 1. 엔터키: 무조건 완료 (스킵 기능 포함)
         if (e.key === 'Enter') {
             e.preventDefault(); 
-            if (typeInput.value.length === 0) return; // 빈 입력 방지
+            if (typeInput.value.length === 0) return; 
             finishSentence();
         } 
-        // 2. 스페이스바: 문장이 완성되었을 때만 다음으로 넘어감
         else if (e.key === ' ' && isComplete) {
             e.preventDefault();
             finishSentence();
@@ -1082,8 +1058,7 @@
         if (completedCount >= targetCount) {
             finishSession();
         } else {
-            showToast();
-            // [수정] setTimeout 제거하여 즉시 실행 (입력 버퍼 문제 해결)
+            // showToast(); // Toast 제거됨
             updateProgressText();
             loadNextQuote();
         }
