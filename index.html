@@ -7,8 +7,9 @@
     <!-- 모던한 감성을 위한 폰트: Noto Sans KR (본문), Poppins (영문/숫자) -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        /* [CSS - 모던 디자인 스타일] */
+        /* [CSS - 모던 디자인 스타일 & 다크 모드 변수] */
         :root {
+            /* Light Mode (Default) */
             --bg-color: #f0f2f5;
             --container-bg: #ffffff;
             --primary-color: #3b82f6;
@@ -18,10 +19,55 @@
             --wrong-color: #ef4444;
             --sub-text-color: #6b7280;
             --correct-color: #10b981;
+            
+            /* UI Elements */
+            --btn-bg: #ffffff;
+            --btn-border: #e5e7eb;
+            --btn-hover-bg: #f8fafc;
+            --input-bg: #f9fafb;
+            --input-border: #e5e7eb;
+            --stat-bg: #f9fafb;
+            
+            /* Cat & Keyboard Colors */
+            --cat-fill: #f3f4f6;
+            --cat-stroke: #374151;
+            --cat-cheek: #fca5a5;
+            --kb-base: #e5e7eb;
+            --kb-key: #ffffff;
+
             --font-kr: 'Noto Sans KR', sans-serif;
             --font-en: 'Poppins', sans-serif;
             --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             --radius-lg: 24px;
+        }
+
+        /* Dark Mode Override */
+        [data-theme="dark"] {
+            --bg-color: #111827;
+            --container-bg: #1f2937;
+            --primary-color: #60a5fa; /* 조금 더 밝은 블루 */
+            --accent-color: #a78bfa;
+            --text-color: #f3f4f6;
+            /* [수정] 다크모드에서 미입력 텍스트 가시성 향상 (더 밝게) */
+            --untyped-color: #9ca3af; 
+            --wrong-color: #f87171;
+            --sub-text-color: #9ca3af;
+            --correct-color: #34d399;
+
+            /* UI Elements */
+            --btn-bg: #374151;
+            --btn-border: #4b5563;
+            --btn-hover-bg: #4b5563;
+            --input-bg: #374151;
+            --input-border: #4b5563;
+            --stat-bg: #374151;
+
+            /* Cat & Keyboard Colors */
+            --cat-fill: #374151;
+            --cat-stroke: #e5e7eb;
+            --cat-cheek: #ef4444; /* 다크모드에서 잘 보이게 진하게 */
+            --kb-base: #4b5563;
+            --kb-key: #1f2937;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -36,6 +82,7 @@
             min-height: 100vh;
             padding: 20px;
             line-height: 1.6;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         .container {
@@ -50,6 +97,7 @@
             align-items: center;
             position: relative;
             overflow: hidden;
+            transition: background-color 0.3s ease;
         }
 
         /* --- Header & Options --- */
@@ -77,12 +125,12 @@
             align-items: center;
         }
 
-        /* [수정] 통일된 버튼/컨트롤 스타일 (.header-btn) */
+        /* 통일된 버튼/컨트롤 스타일 (.header-btn) */
         .header-btn {
-            height: 38px; /* 높이 고정으로 통일감 부여 */
+            height: 38px;
             padding: 0 14px;
-            background: white;
-            border: 1px solid #e5e7eb;
+            background: var(--btn-bg);
+            border: 1px solid var(--btn-border);
             border-radius: 8px;
             display: flex;
             align-items: center;
@@ -102,14 +150,14 @@
         .header-btn:hover {
             border-color: var(--primary-color);
             color: var(--primary-color);
-            background: #f8fafc;
+            background: var(--btn-hover-bg);
             transform: translateY(-1px);
         }
 
-        /* Select 박스 커스텀 (버튼 모양 흉내) */
+        /* Select 박스 커스텀 */
         .select-wrapper {
             position: relative;
-            padding: 0 10px; /* 내부 여백 */
+            padding: 0 10px;
         }
         
         .select-wrapper select {
@@ -146,17 +194,19 @@
             overflow: visible; 
         }
 
-        .cat-body { fill: #f3f4f6; stroke: #374151; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
-        .cat-feature { fill: none; stroke: #374151; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
-        .cat-eyes-fill { fill: #374151; }
-        .cat-cheeks { fill: #fca5a5; opacity: 0; transition: opacity 0.3s; }
-        .cat-paws { fill: #f3f4f6; stroke: #374151; stroke-width: 2.5; }
-        .keyboard { fill: #e5e7eb; stroke: #374151; stroke-width: 2; }
-        .key { fill: #ffffff; stroke: #374151; stroke-width: 1.5; }
+        /* SVG Color Variables Applied */
+        .cat-body { fill: var(--cat-fill); stroke: var(--cat-stroke); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; transition: fill 0.3s, stroke 0.3s; }
+        .cat-feature { fill: none; stroke: var(--cat-stroke); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; transition: stroke 0.3s; }
+        .cat-eyes-fill { fill: var(--cat-stroke); transition: fill 0.3s; }
+        .cat-cheeks { fill: var(--cat-cheek); opacity: 0; transition: opacity 0.3s, fill 0.3s; }
+        .cat-paws { fill: var(--cat-fill); stroke: var(--cat-stroke); stroke-width: 2.5; transition: fill 0.3s, stroke 0.3s; }
+        .keyboard { fill: var(--kb-base); stroke: var(--cat-stroke); stroke-width: 2; transition: fill 0.3s, stroke 0.3s; }
+        .key { fill: var(--kb-key); stroke: var(--cat-stroke); stroke-width: 1.5; transition: fill 0.3s, stroke 0.3s; }
 
         /* Rain Cloud Styles */
         .rain-group { opacity: 0; transition: opacity 0.2s; }
-        .rain-cloud { fill: #cbd5e1; stroke: #64748b; stroke-width: 2; }
+        .rain-cloud { fill: #cbd5e1; stroke: #64748b; stroke-width: 2; } /* 구름은 다크모드에서도 비슷하게 유지하거나 조정 가능 */
+        [data-theme="dark"] .rain-cloud { fill: #4b5563; stroke: #9ca3af; }
         .raindrop { stroke: #60a5fa; stroke-width: 2; stroke-linecap: round; }
 
         /* Face & Ears Groups */
@@ -243,10 +293,10 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            background: #f9fafb;
+            background: var(--stat-bg);
             padding: 15px 10px;
             border-radius: 12px;
-            transition: transform 0.2s;
+            transition: transform 0.2s, background-color 0.3s;
         }
         .stat-item:hover { transform: translateY(-2px); }
         .stat-label { font-size: 0.75rem; color: var(--sub-text-color); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
@@ -271,6 +321,7 @@
             color: var(--untyped-color);
             font-weight: 300;
             white-space: pre-wrap; 
+            transition: color 0.3s ease; /* 색상 전환 부드럽게 */
         }
 
         .quote-display span { 
@@ -331,11 +382,12 @@
 
         .progress-bar {
             height: 6px;
-            background: #e5e7eb;
+            background: var(--input-border);
             width: 100%;
             margin-top: 5px;
             border-radius: 999px;
             overflow: hidden;
+            transition: background-color 0.3s;
         }
 
         .progress-fill {
@@ -361,12 +413,17 @@
             transition: all 0.4s ease;
             z-index: 20;
         }
+        
+        [data-theme="dark"] .modal {
+            background: rgba(17, 24, 39, 0.9); /* Dark background for modal */
+        }
+        
         .modal.show { opacity: 1; pointer-events: all; }
         .modal h2 { font-size: 2.5rem; margin-bottom: 30px; background: linear-gradient(to right, var(--primary-color), var(--accent-color)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; }
         .modal p { font-size: 1.3rem; margin-bottom: 12px; font-weight: 500; color: var(--text-color); }
         .highlight { color: var(--primary-color); font-weight: 800; }
-        .restart-btn { margin-top: 40px; padding: 14px 40px; background: var(--text-color); color: white; border: none; border-radius: 12px; font-family: var(--font-kr); font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
-        .restart-btn:hover { transform: translateY(-2px); background: black; }
+        .restart-btn { margin-top: 40px; padding: 14px 40px; background: var(--text-color); color: var(--container-bg); border: none; border-radius: 12px; font-family: var(--font-kr); font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        .restart-btn:hover { transform: translateY(-2px); opacity: 0.9; }
 
         /* Notification Toast */
         .toast {
@@ -384,6 +441,12 @@
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
+        
+        [data-theme="dark"] .toast {
+            background: rgba(243, 244, 246, 0.9);
+            color: #1f2937;
+        }
+
         .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
         /* Help Modal */
@@ -410,7 +473,7 @@
         }
 
         .help-modal-content {
-            background: white;
+            background: var(--container-bg);
             padding: 40px 30px;
             border-radius: var(--radius-lg);
             width: 90%;
@@ -419,6 +482,7 @@
             position: relative;
             transform: translateY(20px);
             transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border: 1px solid var(--btn-border);
         }
 
         .help-modal-overlay.open .help-modal-content {
@@ -490,6 +554,11 @@
     <div class="header">
         <div class="title">여우비온 Type</div>
         <div class="controls">
+            <!-- [추가] 다크모드 토글 버튼 -->
+            <button class="header-btn" onclick="toggleTheme()" id="theme-toggle" title="Switch Theme">
+                <span id="theme-icon">🌙</span>
+            </button>
+
             <!-- 1. Goal (Select) -->
             <div class="header-btn select-wrapper">
                 <span class="select-label">문장 갯수</span>
@@ -505,7 +574,7 @@
                 <span>↻</span> 다시 시작
             </button>
 
-            <!-- 3. Help Button (Removed '?') -->
+            <!-- 3. Help Button -->
             <button class="header-btn" onclick="openHelp()">
                 도움말
             </button>
@@ -514,10 +583,9 @@
 
     <!-- Enhanced Cat Stage -->
     <div class="cat-stage" id="cat-stage">
-        <!-- viewBox 위쪽 확장 유지 -->
         <svg class="vector-cat" viewBox="0 -20 100 120" xmlns="http://www.w3.org/2000/svg">
             
-            <!-- Rain Cloud Group (머리 위쪽) -->
+            <!-- Rain Cloud Group -->
             <g class="rain-group" transform="translate(0, 0)">
                 <path d="M35,-5 Q40,-15 50,-10 Q60,-15 65,-5 Q70,0 60,0 L40,0 Q30,0 35,-5 Z" class="rain-cloud" />
                 <line x1="40" y1="2" x2="40" y2="8" class="raindrop" />
@@ -539,13 +607,12 @@
             <!-- Body -->
             <path d="M25,85 L25,45 Q25,25 50,25 Q75,25 75,45 L75,85 Z" class="cat-body" />
             
-            <!-- 1. Normal Ears (쫑긋한 귀) -->
+            <!-- Ears -->
             <g class="ears-group ears-normal">
                 <path d="M28,30 L20,10 L45,26" class="cat-body" />
                 <path d="M72,30 L80,10 L55,26" class="cat-body" />
             </g>
 
-            <!-- 2. Folded Ears (접힌 귀 - Error State) -->
             <g class="ears-group ears-folded">
                 <path d="M28,30 L18,22 L45,26" class="cat-body" /> 
                 <path d="M72,30 L82,22 L55,26" class="cat-body" /> 
@@ -558,21 +625,19 @@
             <ellipse cx="35" cy="82" rx="8" ry="6" class="cat-paws paw-l" />
             <ellipse cx="65" cy="82" rx="8" ry="6" class="cat-paws paw-r" />
 
-            <!-- Normal Face -->
+            <!-- Faces -->
             <g class="face-group face-normal">
                 <circle cx="35" cy="45" r="3.5" class="cat-eyes-fill eye-l" />
                 <circle cx="65" cy="45" r="3.5" class="cat-eyes-fill eye-r" />
                 <path d="M45,60 Q50,65 55,60" class="cat-feature" /> 
             </g>
 
-            <!-- Error Face -->
             <g class="face-group face-error">
                 <path d="M30,42 L38,45 L30,48" class="cat-feature" fill="none" />
                 <path d="M70,42 L62,45 L70,48" class="cat-feature" fill="none" />
                 <path d="M42,62 Q46,58 50,62 Q54,66 58,62" class="cat-feature" fill="none" />
             </g>
 
-            <!-- Success / Happy Typing -->
             <g class="face-group face-success">
                 <path d="M30,45 Q35,40 40,45" class="cat-feature" fill="none" />
                 <path d="M60,45 Q65,40 70,45" class="cat-feature" fill="none" />
@@ -611,7 +676,7 @@
 
     <div class="toast" id="toast">Next Quote ✨</div>
 
-    <!-- 도움말 모달 -->
+    <!-- Help Modal -->
     <div class="help-modal-overlay" id="help-modal" onclick="closeHelp(event)">
         <div class="help-modal-content" onclick="event.stopPropagation()">
             <button class="help-close-btn" onclick="closeHelp()">×</button>
@@ -652,7 +717,7 @@
         "키보드는 하나인데 장패드는 왜 이렇게 많을까, 나도 모른다.",
         "오늘도 키보드 사려고 일하는지, 일하려고 키보드를 사는지 헷갈린다.",
         "통장 잔액은 비어가는데 책상 위 키보드는 늘어만 간다.",
-        "키보드는 꽉 찼는데 더 사놓고 이건 또 다른 느낌이라고 변명한다.",
+        "키보드는 꽉 찼는데 더 사놓고 이건 또 다른 느낌라고 변명한다.",
         "알루미늄 하우징을 샀으면, 그 무게만큼 책임도 진다.",
         "가스켓 구조를 알기 전으로는 다시 돌아갈 수 없다.",
         "스위치 윤활을 시작한 순간, 주말은 네 것이 아니다.",
@@ -712,8 +777,7 @@
         "뜻이 있는 곳에 길이 있으니 일단 키보드는 사고 봐라.",
         "마음이 혼란스러울 땐, 키보드를 청소하라.",
         "성공이란 실패를 거듭해도 스테빌을 다시 잡는 용기다.",
-        "완벽한 순간을 기다리지 마라. 타건감은 만들면 된다.",
-        "물 흐르듯 자연스럽게 여우비온 키보드 리뷰 영상을 보고 있네.",
+        "물 흐르듯 자연스럽게 여우비온 키보드 영상을 보고 있네.",
         "진짜 행복한 삶은 돈이 많은 것이 아니라, 키보드가 많은 것이다.",
         "구부러진 스위치핀 처럼 내 인생도 다시 펴서 잘 작동하면 좋겠어.",
         "언젠가 정말 내 인생 최고의 키보드를 만나면 좋겠다.",
@@ -823,6 +887,21 @@
     const catStage = document.getElementById('cat-stage');
     const countSelect = document.getElementById('sentence-count-select');
     const toast = document.getElementById('toast');
+    const themeIcon = document.getElementById('theme-icon');
+
+    // --- 다크 모드 토글 함수 ---
+    function toggleTheme() {
+        const html = document.documentElement;
+        const currentTheme = html.getAttribute('data-theme');
+        
+        if (currentTheme === 'dark') {
+            html.setAttribute('data-theme', 'light');
+            themeIcon.textContent = '🌙';
+        } else {
+            html.setAttribute('data-theme', 'dark');
+            themeIcon.textContent = '☀️';
+        }
+    }
 
     // --- 유틸리티: 피셔-예이츠 셔플 ---
     function shuffle(array) {
@@ -1087,6 +1166,14 @@
         }
     });
 
+    // [추가] 결과 모달에서 엔터키로 재시작
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && modal.classList.contains('show')) {
+            e.preventDefault();
+            resetSession();
+        }
+    });
+
     // --- 문장 완료 ---
     function finishSentence() {
         const finalStats = calculateCurrentStats(); 
@@ -1153,5 +1240,5 @@
     resetSession();
 
 </script>
-
-
+</body>
+</html>
